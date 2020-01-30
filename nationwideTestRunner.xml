@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Ant Example" default="test" basedir=".">
+    <property name="project_name" value="junitSamples" />
+    <property name="src" location="src" />
+    <property name="build" location="build/classes" />
+	<!--property name="classes" location="classes"/-->
+    <property name="libs" location="libs" />
+    <property name="reports" location="reports" />
+	
+	<path id="class.path">
+		<fileset dir="libs">
+			<include name="*.jar"/>
+		</fileset>
+		<pathelement location="${build}"/>
+	</path>	
+	
+	<target name="clean">
+	        <delete dir="{build}" />
+	        <delete dir="${reports}" />
+	</target>
+	
+	
+    <target name="init" depends="clean">
+        <mkdir dir="${build}" />
+        
+        <mkdir dir="${reports}" />
+        <mkdir dir="${reports}/xml" />
+        <mkdir dir="${reports}/html" />
+    </target>
+
+    <target name="compile" depends="init">
+        <javac includeantruntime="false" srcdir="${src}" destdir="${build}" description="compile the source code ">
+            <classpath refid="class.path">
+        	<!--classpath>
+                <fileset dir="libs">
+                    <include name="**/*.jar" />
+                </fileset-->
+            </classpath>
+        </javac>
+    </target>
+	
+    
+	
+
+    <target name="run-tests" depends="compile">
+    	<junit fork="yes">
+    		<sysproperty key="screenshotPath" value="C:/Failures"/>
+    	    <formatter type="xml"/>
+    	    <classpath refid="class.path"/>
+    		<!--classpath>
+    		                <fileset dir="libs">
+    		                    <include name="**/*.jar" />
+    		                </fileset>
+    		            </classpath-->
+    	    <batchtest todir="${reports}/xml">
+    	        <fileset dir="${build}">
+    	            <include name="**/TestSuite.class"/>
+    	        </fileset>
+    	    </batchtest>
+    	</junit>
+    </target>
+
+    <target name="test" depends="run-tests">
+        <junitreport todir="${reports}">
+            <fileset dir="${reports}/xml">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report styledir="." format="frames" todir="${reports}/html" />
+        </junitreport>
+    </target>
+
+    <!--<target name="all" depends="clean, test" />-->
+</project>
